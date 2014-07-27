@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context" xmlns:osgi="http://www.springframework.org/schema/osgi"
+  xmlns:osgix="http://www.springframework.org/schema/osgi-compendium" xmlns:osgicm="http://camel.apache.org/schema/osgi"
+  xmlns:cxf="http://camel.apache.org/schema/cxf" xmlns:spring="http://camel.apache.org/schema/spring" xmlns:jaxws="http://cxf.apache.org/jaxws"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
+    http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+    http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd 
+    http://camel.apache.org/schema/osgi http://camel.apache.org/schema/osgi/camel-osgi.xsd 
+    http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd">
+
+  <osgix:cm-properties id="ftpProps" persistent-id="it.gcatania.camel.ftp.example" />
+  <context:property-placeholder properties-ref="ftpProps" />
+
+  <bean id="ftpStatusHandler" class="it.gcatania.camel.ftp.example.route.FtpConnectionStatusHandler">
+    <osgix:managed-properties persistent-id="it.gcatania.camel.ftp.example" />
+    <property name="producer" ref="ftpStatusTemplate" />
+  </bean>
+  <bean id="fileFromFtpPollStrategy" class="it.gcatania.camel.ftp.example.route.FileFromFtpPollStrategy">
+    <property name="handler" ref="ftpStatusHandler" />
+  </bean>
+  <bean id="fileToFtpPollStrategy" class="it.gcatania.camel.ftp.example.route.FileToFtpPollStrategy">
+    <property name="handler" ref="ftpStatusHandler" />
+  </bean>
+  <bean id="fileToFtpProcessStrategy" class="it.gcatania.camel.ftp.example.route.FileToFtpProcessStrategy">
+    <property name="handler" ref="ftpStatusHandler" />
+  </bean>
+
+  <bean id="ftpRoute" class="it.gcatania.camel.ftp.example.route.FtpRoute">
+    <osgix:managed-properties persistent-id="it.gcatania.camel.ftp.example" />
+  </bean>
+
+  <osgicm:camelContext xmlns="http://camel.apache.org/schema/spring">
+    <template id="ftpStatusTemplate" />
+    <routeBuilder ref="ftpRoute" />
+  </osgicm:camelContext>
+</beans>
